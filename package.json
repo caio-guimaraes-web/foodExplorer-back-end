@@ -1,0 +1,15 @@
+{
+  "name": "api-food-explorer",
+  "version": "1.0.0",
+  "description": "Back-end contendo api para o projeto final Food Explorer. Projeto para avaliação da Rocketseat nível explorer",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./src/server.js"
+  },
+  "keywords": [],
+  "author": "Caio Guimarães",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
