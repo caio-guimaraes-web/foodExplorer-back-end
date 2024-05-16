@@ -1,5 +1,5 @@
 exports.up = (knex) =>
-  knex.schema.createTable("tags", (table) => {
+  knex.schema.createTable("ingredients", (table) => {
     table.increments("id")
     table.text("name").notNullable()
 
@@ -10,4 +10,4 @@ exports.up = (knex) =>
       .onDelete("CASCADE")
   })
 
-exports.down = (knex) => knex.schema.dropTable("tags")
+exports.down = (knex) => knex.schema.dropTable("ingredients")
