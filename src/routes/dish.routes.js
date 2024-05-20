@@ -10,4 +10,6 @@ dishRoutes.post("/:user_id", dishController.create)
 dishRoutes.get("/:id", dishController.show)
 dishRoutes.delete("/:id", dishController.delete)
 
+dishRoutes.get("/", dishController.index)
+
 module.exports = dishRoutes
