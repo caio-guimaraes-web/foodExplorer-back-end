@@ -64,7 +64,12 @@ class DishController {
         .split(",")
         .map((ingredients) => ingredients.trim())
 
-      dishes = await knex("ingredients").whereIn("name", filterIngredients)
+      dishes = await knex("ingredients")
+        .select(["dish.id", "dish.title", "ingredients.name"])
+        .whereLike("dish.title", `%${title}%`)
+        .whereIn("name", filterIngredients)
+        .innerJoin("dish", "dish.id", "ingredients.dish_id")
+        .orderBy("dish.title")
     } else {
       dishes = await knex("dish")
         .whereLike("title", `%${title}%`)
