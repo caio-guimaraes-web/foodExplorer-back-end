@@ -45,12 +45,31 @@ class DishController {
     return response.json()
   }
 
-  async index(request, response) {
+  /* async index(request, response) {
     const { title } = request.query
 
     const dishes = await knex("dish")
       .whereLike("title", `%${title}%`)
       .orderBy("title")
+
+    return response.json(dishes)
+  } */
+  async index(request, response) {
+    const { title, ingredients } = request.query
+
+    let dishes
+
+    if (ingredients) {
+      const filterIngredients = ingredients
+        .split(",")
+        .map((ingredients) => ingredients.trim())
+
+      dishes = await knex("ingredients").whereIn("name", filterIngredients)
+    } else {
+      dishes = await knex("dish")
+        .whereLike("title", `%${title}%`)
+        .orderBy("title")
+    }
 
     return response.json(dishes)
   }
