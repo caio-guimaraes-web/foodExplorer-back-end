@@ -45,15 +45,6 @@ class DishController {
     return response.json()
   }
 
-  /* async index(request, response) {
-    const { title } = request.query
-
-    const dishes = await knex("dish")
-      .whereLike("title", `%${title}%`)
-      .orderBy("title")
-
-    return response.json(dishes)
-  } */
   async index(request, response) {
     const { title, ingredients } = request.query
 
@@ -76,7 +67,19 @@ class DishController {
         .orderBy("title")
     }
 
-    return response.json(dishes)
+    const userIngredients = await knex("ingredients")
+    const dishWhithIngredients = dishes.map((dish) => {
+      const dishIngredients = userIngredients.filter(
+        (ingredient) => ingredient.dish_id === dish.id
+      )
+
+      return {
+        ...dish,
+        ingredients: dishIngredients,
+      }
+    })
+
+    return response.json(dishWhithIngredients)
   }
 }
 
