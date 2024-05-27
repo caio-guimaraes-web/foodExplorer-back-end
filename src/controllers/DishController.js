@@ -1,9 +1,19 @@
 const knex = require("../database/knex")
+const AppError = require("../utils/AppError")
 
 class DishController {
   async create(request, response) {
     const { title, description, image_url, ingredients } = request.body
-    const { user_id } = request.params
+    /* const { user_id } = request.params */
+    const user_id = request.user.id
+    /* console.log(user_id) */
+
+    /* valida se o usuário é administrador para dar permissão à criação de pratos */
+    const user = await knex("users").where({ id: user_id }).first()
+
+    if (!user || !user.is_admin) {
+      throw new AppError("Este usuário não é um administrador.", 403)
+    }
 
     const [dish_id] = await knex("dish").insert({
       title,
