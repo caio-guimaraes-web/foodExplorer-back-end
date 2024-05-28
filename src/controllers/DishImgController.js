@@ -6,6 +6,14 @@ class DishImgController {
   async update(request, response) {
     const { id: dish_id } = request.params // Extrair o dish_id
     const avatarFilename = request.file.filename
+    const user_id = request.user.id
+
+    /* o ensureauthenticated possui id do usuário */
+    const user = await knex("users").where({ id: user_id }).first()
+
+    if (!user || !user.is_admin) {
+      throw new AppError("Este usuário não é um administrador.", 403)
+    }
 
     const diskStorage = new DiskStorage()
 
