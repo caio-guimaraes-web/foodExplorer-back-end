@@ -91,6 +91,53 @@ class DishController {
 
     return response.json(dishWhithIngredients)
   }
+
+  async update(request, response) {
+    const { id } = request.params
+    const { title, description, image_url, ingredients } = request.body
+    const user_id = request.user.id
+    console.log(id)
+
+    const user = await knex("users").where({ id: user_id }).first()
+
+    if (!user || !user.is_admin) {
+      throw new AppError("Este usuário não é um administrador.", 403)
+    }
+
+    const dish = await knex("dish").where({ id }).first()
+
+    if (!dish) {
+      throw new AppError("Prato não encontrado.", 404)
+    }
+
+    await knex("dish").where({ id }).update({
+      title,
+      description,
+      image_url,
+      updated_at: knex.fn.now(),
+    })
+
+    if (ingredients && ingredients.length > 0) {
+      await knex("ingredients").where({ dish_id: id }).delete()
+
+      const ingredientsInsert = ingredients.map((ingredient) => {
+        return {
+          dish_id: id,
+          name: ingredient,
+        }
+      })
+
+      await knex("ingredients").insert(ingredientsInsert)
+    }
+
+    response.json()
+  }
 }
 
 module.exports = DishController
+
+/* 
+- falta inserir a rota de update de pratos em dish routes.
+- a rota de atualização precisa do ensure athenticated pra recuperar o id do usuário.
+- ainda falta resolver o upload de imagem
+ */

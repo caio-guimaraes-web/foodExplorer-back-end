@@ -10,7 +10,7 @@ const dishController = new DishController()
 dishRoutes.post("/", ensureAuthenticated, dishController.create)
 dishRoutes.get("/:id", dishController.show)
 dishRoutes.delete("/:id", dishController.delete)
-
 dishRoutes.get("/", dishController.index)
+dishRoutes.put("/:id", ensureAuthenticated, dishController.update)
 
 module.exports = dishRoutes
