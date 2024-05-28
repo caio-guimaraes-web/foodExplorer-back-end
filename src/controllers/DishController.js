@@ -96,7 +96,6 @@ class DishController {
     const { id } = request.params
     const { title, description, image_url, ingredients } = request.body
     const user_id = request.user.id
-    console.log(id)
 
     const user = await knex("users").where({ id: user_id }).first()
 
