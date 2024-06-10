@@ -5,7 +5,7 @@ const DiskStorage = require("../providers/DiskStorage")
 class DishImgController {
   async update(request, response) {
     const { id: dish_id } = request.params // Extrair o dish_id
-    const avatarFilename = request.file.filename
+    const dishImgFileName = request.file.filename
     const user_id = request.user.id
 
     /* o ensureauthenticated possui id do usuário */
@@ -27,7 +27,7 @@ class DishImgController {
       await diskStorage.deleteFile(dish.image_url)
     }
 
-    const filename = await diskStorage.saveFile(avatarFilename)
+    const filename = await diskStorage.saveFile(dishImgFileName)
     dish.image_url = filename
 
     await knex("dish").update(dish).where({ id: dish_id })
