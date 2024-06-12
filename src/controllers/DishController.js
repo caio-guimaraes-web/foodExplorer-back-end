@@ -3,7 +3,8 @@ const AppError = require("../utils/AppError")
 
 class DishController {
   async create(request, response) {
-    const { title, description, image_url, ingredients } = request.body
+    const { name, description, category, price, image_url, ingredients } =
+      request.body
     /* const { user_id } = request.params */
     const user_id = request.user.id
     /* console.log(user_id) */
@@ -16,8 +17,10 @@ class DishController {
     }
 
     const [dish_id] = await knex("dish").insert({
-      title,
+      name,
       description,
+      category,
+      price,
       user_id,
     })
 
@@ -30,7 +33,9 @@ class DishController {
 
     await knex("ingredients").insert(ingredientsInsert)
 
-    response.json()
+    /* response.json() */
+    // Retorna o ID do prato criado
+    response.json({ id: dish_id })
   }
 
   async show(request, response) {

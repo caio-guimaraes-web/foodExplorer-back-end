@@ -21,7 +21,7 @@ dishRoutes.put("/:id", ensureAuthenticated, dishController.update)
 dishRoutes.patch(
   "/img/:id",
   ensureAuthenticated,
-  upload.single("img"),
+  upload.single("image"),
   dishImgController.update
 )
 

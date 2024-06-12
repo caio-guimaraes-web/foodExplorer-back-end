@@ -5,10 +5,10 @@ const DiskStorage = require("../providers/DiskStorage")
 class DishImgController {
   async update(request, response) {
     const { id: dish_id } = request.params // Extrair o dish_id
-    const dishImgFileName = request.file.filename
+    const { filename: dishImgFileName } = request.file // Certifique-se de que request.file está preenchido
     const user_id = request.user.id
 
-    /* o ensureauthenticated possui id do usuário */
+    // Verifica se o usuário é administrador
     const user = await knex("users").where({ id: user_id }).first()
 
     if (!user || !user.is_admin) {
