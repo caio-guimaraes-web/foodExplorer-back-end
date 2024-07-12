@@ -5,11 +5,9 @@ class DishController {
   async create(request, response) {
     const { name, description, category, price, image_url, ingredients } =
       request.body
-    /* const { user_id } = request.params */
     const user_id = request.user.id
-    /* console.log(user_id) */
 
-    /* valida se o usuário é administrador para dar permissão à criação de pratos */
+    // Valida se o usuário é administrador para dar permissão à criação de pratos
     const user = await knex("users").where({ id: user_id }).first()
 
     if (!user || !user.is_admin) {
@@ -33,7 +31,6 @@ class DishController {
 
     await knex("ingredients").insert(ingredientsInsert)
 
-    /* response.json() */
     // Retorna o ID do prato criado
     response.json({ id: dish_id })
   }
@@ -61,29 +58,30 @@ class DishController {
   }
 
   async index(request, response) {
-    const { title, ingredients } = request.query
+    const { name, ingredients } = request.query
 
     let dishes
 
     if (ingredients) {
       const filterIngredients = ingredients
         .split(",")
-        .map((ingredients) => ingredients.trim())
+        .map((ingredient) => ingredient.trim())
 
       dishes = await knex("ingredients")
-        .select(["dish.id", "dish.title", "ingredients.name"])
-        .whereLike("dish.title", `%${title}%`)
-        .whereIn("name", filterIngredients)
+        .select(["dish.id", "dish.name", "ingredients.name"])
+        .whereLike("dish.name", `%${name}%`)
+        .whereIn("ingredients.name", filterIngredients)
         .innerJoin("dish", "dish.id", "ingredients.dish_id")
-        .orderBy("dish.title")
+        .orderBy("dish.name")
+    } else if (name) {
+      dishes = await knex("dish").whereLike("name", `%${name}%`).orderBy("name")
     } else {
-      dishes = await knex("dish")
-        .whereLike("title", `%${title}%`)
-        .orderBy("title")
+      // Novo bloco para retornar todos os pratos
+      dishes = await knex("dish").orderBy("name")
     }
 
     const userIngredients = await knex("ingredients")
-    const dishWhithIngredients = dishes.map((dish) => {
+    const dishWithIngredients = dishes.map((dish) => {
       const dishIngredients = userIngredients.filter(
         (ingredient) => ingredient.dish_id === dish.id
       )
@@ -94,12 +92,12 @@ class DishController {
       }
     })
 
-    return response.json(dishWhithIngredients)
+    return response.json(dishWithIngredients)
   }
 
   async update(request, response) {
     const { id } = request.params
-    const { title, description, image_url, ingredients } = request.body
+    const { name, description, image_url, ingredients } = request.body
     const user_id = request.user.id
 
     const user = await knex("users").where({ id: user_id }).first()
@@ -115,7 +113,7 @@ class DishController {
     }
 
     await knex("dish").where({ id }).update({
-      title,
+      name,
       description,
       image_url,
       updated_at: knex.fn.now(),
@@ -139,9 +137,3 @@ class DishController {
 }
 
 module.exports = DishController
-
-/* 
-- falta inserir a rota de update de pratos em dish routes.
-- a rota de atualização precisa do ensure athenticated pra recuperar o id do usuário.
-- ainda falta resolver o upload de imagem
- */
