@@ -62,27 +62,45 @@ class DishController {
 
     let dishes
 
-    if (ingredients) {
+    if (ingredients && name) {
       const filterIngredients = ingredients
         .split(",")
         .map((ingredient) => ingredient.trim())
 
-      dishes = await knex("ingredients")
-        .select(["dish.id", "dish.name", "ingredients.name"])
-        .whereLike("dish.name", `%${name}%`)
-        .whereIn("ingredients.name", filterIngredients)
-        .innerJoin("dish", "dish.id", "ingredients.dish_id")
-        .orderBy("dish.name")
+      dishes = await knex("dish")
+        .where("name", "like", `%${name}%`)
+        .orWhereIn(
+          "id",
+          knex("ingredients")
+            .select("dish_id")
+            .whereIn("name", filterIngredients)
+        )
+        .orderBy("name")
+    } else if (ingredients) {
+      const filterIngredients = ingredients
+        .split(",")
+        .map((ingredient) => ingredient.trim())
+
+      dishes = await knex("dish")
+        .whereIn(
+          "id",
+          knex("ingredients")
+            .select("dish_id")
+            .whereIn("name", filterIngredients)
+        )
+        .orderBy("name")
     } else if (name) {
-      dishes = await knex("dish").whereLike("name", `%${name}%`).orderBy("name")
+      dishes = await knex("dish")
+        .where("name", "like", `%${name}%`)
+        .orderBy("name")
     } else {
-      // Novo bloco para retornar todos os pratos
       dishes = await knex("dish").orderBy("name")
     }
 
-    const userIngredients = await knex("ingredients")
-    const dishWithIngredients = dishes.map((dish) => {
-      const dishIngredients = userIngredients.filter(
+    const allIngredients = await knex("ingredients")
+
+    const dishesWithIngredients = dishes.map((dish) => {
+      const dishIngredients = allIngredients.filter(
         (ingredient) => ingredient.dish_id === dish.id
       )
 
@@ -92,7 +110,7 @@ class DishController {
       }
     })
 
-    return response.json(dishWithIngredients)
+    return response.json(dishesWithIngredients)
   }
 
   async update(request, response) {
