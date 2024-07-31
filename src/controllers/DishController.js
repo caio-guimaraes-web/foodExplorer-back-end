@@ -115,7 +115,8 @@ class DishController {
 
   async update(request, response) {
     const { id } = request.params
-    const { name, description, image_url, ingredients } = request.body
+    const { name, description, image_url, ingredients, category, price } =
+      request.body
     const user_id = request.user.id
 
     const user = await knex("users").where({ id: user_id }).first()
@@ -134,6 +135,8 @@ class DishController {
       name,
       description,
       image_url,
+      category,
+      price,
       updated_at: knex.fn.now(),
     })
 
